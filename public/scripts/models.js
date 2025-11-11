@@ -1,15 +1,12 @@
-// scripts/models.js
-export const MODELS = {
-  Construction: {
-    RWI: "urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bXlwbGFudDNkMjAyNTA5MDYvOTcwMDAubndk",
-    interconnecting: "urn:adsk.objects:os.object:your-bucket-id/interconnecting.svf",
-    wtp: "urn:adsk.objects:os.object:your-bucket-id/wtp.svf",
-    "cooling-tower": "urn:adsk.objects:os.object:your-bucket-id/cooling-tower.svf"
-  },
-  Commissioning: {
-    RWI: "urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bXlwbGFudDNkMjAyNTA5MDYvOTcwMDAubndk",
-    interconnecting: "urn:adsk.objects:os.object:your-bucket-id/commissioning-interconnecting.svf",
-    wtp: "urn:adsk.objects:os.object:your-bucket-id/commissioning-wtp.svf",
-    "cooling-tower": "urn:adsk.objects:os.object:your-bucket-id/commissioning-cooling-tower.svf"
-  }
-};
+function getUrnForCurrentPage() {
+  const path = window.location.pathname.toLowerCase();
+
+  const models = {
+    "/construction/rwi.html": "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bXlwbGFudDNkMjAyNTA5MDYvOTcwMDAubndk",
+    "/construction/interconnecting.html": "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6eHh4eHh4eC9Nb2RlbDIubnd0",
+    "/construction/wtp.html": "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6eHh4eHh4eC9Nb2RlbDMubnd0",
+    "/construction/cooling-tower.html": "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6eHh4eHh4eC9Nb2RlbDQubnd0",
+  };
+
+  return models[path] || null;
+}
