@@ -1,2 +1,2 @@
 // scripts/config.js
-export const API_URL = "https://piping-dashboard.vercel.app//api/token";
+export const API_URL = "https://https://piping-dashboard-ed5c.vercel.app/api/token";
