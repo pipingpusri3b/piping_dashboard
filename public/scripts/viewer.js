@@ -1,5 +1,3 @@
-import { initializeViewer } from "./utils.js";
-
 async function initViewer() {
   const container = document.getElementById("viewer");
   const urn = getUrnForCurrentPage(); // ambil dari models.js
