@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
   try {
-    const response = await fetch('https://developer.api.autodesk.com/authentication/v1/authenticate', {
+    const response = await fetch('https://developer.api.autodesk.com/authentication/v2/token', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${credentials}`,
