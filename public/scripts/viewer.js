@@ -1,15 +1,64 @@
-import { initializeViewer } from "./utils.js";
-
 async function initViewer() {
   const container = document.getElementById("viewer");
-  const urn = getUrnForCurrentPage(); // ambil dari models.js
-  const tokenResponse = await fetch("/api/token");
-  const tokenData = await tokenResponse.json();
+
+  if (!container) {
+    console.error("Elemen #viewer tidak ditemukan di halaman.");
+    return;
+  }
+
+  // Ambil URN dari models.js (pastikan models.js sudah di-load dulu di HTML)
+  const urn = getUrnForCurrentPage();
+  if (!urn) {
+    container.innerHTML = "<p>Model belum tersedia untuk halaman ini.</p>";
+    console.warn("Model belum tersedia untuk halaman:", window.location.pathname);
+    return;
+  }
 
   try {
-    await initializeViewer(container, urn, tokenData);
+    // Ambil token dari API Vercel
+    const tokenResponse = await fetch("/api/token");
+    if (!tokenResponse.ok) throw new Error("Gagal fetch token");
+    const tokenData = await tokenResponse.json();
+
+    if (!tokenData.access_token) throw new Error("Token kosong atau invalid");
+
+    console.log("✅ Token berhasil didapat");
+
+    const options = {
+      env: "AutodeskProduction",
+      api: "streamingV2",
+      getAccessToken: (onTokenReady) => {
+        onTokenReady(tokenData.access_token, tokenData.expires_in);
+      },
+    };
+
+    Autodesk.Viewing.Initializer(options, () => {
+      const viewer = new Autodesk.Viewing.GuiViewer3D(container);
+      const startedCode = viewer.start();
+      if (startedCode > 0) {
+        console.error("Viewer gagal start:", startedCode);
+        return;
+      }
+
+      console.log("🚀 Viewer berhasil dimulai, memuat model...");
+
+      Autodesk.Viewing.Document.load(
+        "urn:" + urn,
+        (doc) => {
+          const defaultModel = doc.getRoot().getDefaultGeometry();
+          viewer.loadDocumentNode(doc, defaultModel).then(() => {
+            console.log("✅ Model berhasil dimuat:", urn);
+          });
+        },
+        (errCode, errMsg) => {
+          console.error(`❌ Gagal memuat dokumen (${errCode}): ${errMsg}`);
+          container.innerHTML = `<p>Gagal memuat model.<br>Periksa URN atau status translasi.</p>`;
+        }
+      );
+    });
   } catch (err) {
-    console.error("Kesalahan saat inisialisasi viewer:", err);
+    console.error("❌ Kesalahan saat inisialisasi viewer:", err);
+    container.innerHTML = `<p>Kesalahan saat inisialisasi viewer: ${err.message}</p>`;
   }
 }
 
