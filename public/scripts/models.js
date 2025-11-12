@@ -1,12 +1,12 @@
-const models = {
-  "/Construction/rwi.html": "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bXlwbGFudDNkMjAyNTA5MDYvOTcwMDAubndk",
-  "/Construction/rwi": "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bXlwbGFudDNkMjAyNTA5MDYvOTcwMDAubndk",
-  "/construction/wtp.html": "dXJuOmFkc2sub2JqZWN0czpvZ...",
-  "/construction/wtp": "dXJuOmFkc2sub2JqZWN0czpvZ..."
-};
-
+// Contoh models.js
 function getUrnForCurrentPage() {
   const path = window.location.pathname.toLowerCase();
-  const cleanPath = path.endsWith(".html") ? path : path + ".html";
-  return models[path] || models[cleanPath];
+
+  const models = {
+    "/Construction/rwi.html": "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bXlwbGFudDNkMjAyNTA5MDYvOTcwMDAubndk",  // contoh
+    "/Construction/interconnecting.html": "dXJuOmFkc2sub2JqZWN0czpvcy5ldS1jZW50cmFsLTEuLi4=",
+    // tambahkan lainnya
+  };
+
+  return models[path];
 }
