@@ -43,16 +43,21 @@
         const viewer = new Autodesk.Viewing.GuiViewer3D(viewerDiv);
         viewer.start();
 
-        Autodesk.Viewing.Document.load(
-          documentId,
-          (doc) => {
-            const defaultModel = doc.getRoot().getDefaultGeometry();
-            viewer.loadDocumentNode(doc, defaultModel);
-          },
-          (errCode, errMsg) => {
-            console.error("Error loading document:", errCode, errMsg);
-          }
-        );
+        console.log("🚀 Inisialisasi viewer dengan URN:", urn);
+
+      Autodesk.Viewing.Document.load(
+        'urn:${urn}',
+        (doc) => {
+        console.log("✅ Document berhasil dimuat:", doc);
+        const defaultModel = doc.getRoot().getDefaultGeometry();
+        viewer.loadDocumentNode(doc, defaultModel).then(() => {
+        console.log("✅ Model berhasil dimuat sepenuhnya!");
+        });
+        },
+        (errCode, errMsg) => {
+      console.error("❌ Gagal load document:", errCode, errMsg);
+      }
+      );
       });
     }
 
