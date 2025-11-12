@@ -15,18 +15,19 @@ async function initViewer() {
   }
 
   try {
-    // Ambil token dari API Vercel
+    // Ambil token dari API Vercel (harusnya diarahkan ke EU di /api/token)
     const tokenResponse = await fetch("/api/token");
     if (!tokenResponse.ok) throw new Error("Gagal fetch token");
     const tokenData = await tokenResponse.json();
 
     if (!tokenData.access_token) throw new Error("Token kosong atau invalid");
 
-    console.log("✅ Token berhasil didapat");
+    console.log("✅ Token berhasil didapat dari EU API");
 
+    // Gunakan environment & API region EU
     const options = {
-      env: "AutodeskProduction",
-      api: "streamingV2",
+      env: "AutodeskProduction2",  // 🔹 environment untuk EU
+      api: "derivativeV2_EU",      // 🔹 API EU
       getAccessToken: (onTokenReady) => {
         onTokenReady(tokenData.access_token, tokenData.expires_in);
       },
@@ -52,7 +53,7 @@ async function initViewer() {
         },
         (errCode, errMsg) => {
           console.error(`❌ Gagal memuat dokumen (${errCode}): ${errMsg}`);
-          container.innerHTML = `<p>Gagal memuat model.<br>Periksa URN atau status translasi.</p>`;
+          container.innerHTML = `<p>Gagal memuat model.<br>Periksa URN atau status translasi di region EU.</p>`;
         }
       );
     });
