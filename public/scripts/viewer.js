@@ -1,12 +1,11 @@
 async function initViewer() {
   const container = document.getElementById("viewer");
-
   if (!container) {
     console.error("Elemen #viewer tidak ditemukan di halaman.");
     return;
   }
 
-  // Ambil URN dari models.js (pastikan models.js sudah di-load dulu di HTML)
+  // Ambil URN dari models.js
   const urn = getUrnForCurrentPage();
   if (!urn) {
     container.innerHTML = "<p>Model belum tersedia untuk halaman ini.</p>";
@@ -14,56 +13,47 @@ async function initViewer() {
     return;
   }
 
+  // Ambil token dari backend (token.js)
+  let tokenData;
   try {
-    // Ambil token dari API Vercel (harusnya diarahkan ke EU di /api/token)
-    const tokenResponse = await fetch("/api/token");
-    if (!tokenResponse.ok) throw new Error("Gagal fetch token");
-    const tokenData = await tokenResponse.json();
-
-    if (!tokenData.access_token) throw new Error("Token kosong atau invalid");
-
-    console.log("✅ Token berhasil didapat dari EU API");
-
-    // Gunakan environment & API region EU
-    const options = {
-      env: "AutodeskProduction2",  // 🔹 environment untuk EU
-      api: "derivativeV2_EU",      // 🔹 API EU
-      getAccessToken: (onTokenReady) => {
-        onTokenReady(tokenData.access_token, tokenData.expires_in);
-      },
-    };
-
-    Autodesk.Viewing.Initializer(options, () => {
-      const viewer = new Autodesk.Viewing.GuiViewer3D(container);
-      const startedCode = viewer.start();
-      if (startedCode > 0) {
-        console.error("Viewer gagal start:", startedCode);
-        return;
-      }
-
-      console.log("🚀 Viewer berhasil dimulai, memuat model...");
-
-      Autodesk.Viewing.Document.load(
-        "urn:" + urn,
-        (doc) => {
-          const defaultModel = doc.getRoot().getDefaultGeometry();
-          viewer.loadDocumentNode(doc, defaultModel).then(() => {
-            console.log("✅ Model berhasil dimuat:", urn);
-          });
-        },
-        (errCode, errMsg) => {
-          console.error(`❌ Gagal memuat dokumen (${errCode}): ${errMsg}`);
-          container.innerHTML = `<p>Gagal memuat model.<br>Periksa URN atau status translasi di region EU.</p>`;
-        }
-      );
-    });
+    const res = await fetch("/api/token");
+    if (!res.ok) throw new Error("Gagal mengambil token dari server");
+    tokenData = await res.json();
   } catch (err) {
-    console.error("❌ Kesalahan saat inisialisasi viewer:", err);
-    container.innerHTML = `<p>Kesalahan saat inisialisasi viewer: ${err.message}</p>`;
+    console.error("❌ Gagal mendapatkan token:", err);
+    container.innerHTML = `<p>Gagal mengambil token dari server.</p>`;
+    return;
   }
+
+  // Viewer options untuk region EU
+  const options = {
+    env: "AutodeskProduction2", // region EU
+    api: "derivativeV2_EU",     // region EU
+    getAccessToken: (onTokenReady) => {
+      onTokenReady(tokenData.access_token, tokenData.expires_in);
+    },
+  };
+
+  // Inisialisasi viewer
+  Autodesk.Viewing.Initializer(options, () => {
+    const viewer = new Autodesk.Viewing.GuiViewer3D(container);
+    viewer.start();
+
+    console.log("🚀 Viewer dimulai, memuat model:", urn);
+
+    Autodesk.Viewing.Document.load(
+      `urn:${urn}`,
+      (doc) => {
+        const defaultModel = doc.getRoot().getDefaultGeometry();
+        viewer.loadDocumentNode(doc, defaultModel);
+        console.log("✅ Model berhasil dimuat:", urn);
+      },
+      (errCode, errMsg) => {
+        console.error("❌ Gagal memuat model:", errCode, errMsg);
+        container.innerHTML = `<p>Gagal memuat model.<br>Pastikan URN dan region benar.</p>`;
+      }
+    );
+  });
 }
 
 document.addEventListener("DOMContentLoaded", initViewer);
-const urn = getUrnForCurrentPage();
-console.log("🔍 Path terdeteksi:", window.location.pathname);
-console.log("📦 URN ditemukan:", urn);
