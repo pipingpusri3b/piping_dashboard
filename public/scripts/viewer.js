@@ -64,3 +64,6 @@ async function initViewer() {
 }
 
 document.addEventListener("DOMContentLoaded", initViewer);
+const urn = getUrnForCurrentPage();
+console.log("🔍 Path terdeteksi:", window.location.pathname);
+console.log("📦 URN ditemukan:", urn);
