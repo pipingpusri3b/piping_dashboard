@@ -1,15 +1,31 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Test EU Viewer</title>
-    <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/style.min.css?v=v7.*">
-    <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/viewer3D.min.js?v=v7.*"></script>
-    <style>html,body,#forgeViewer{height:100%;margin:0}</style>
-  </head>
-  <body>
-    <div id="forgeViewer"></div>
-    <script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>APS 3D Viewer</title>
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; }
+    #forgeViewer { width: 100%; height: 100%; }
+  </style>
+
+  <!-- Viewer -->
+  <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/style.min.css?v=v7.*">
+  <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/viewer3D.min.js?v=v7.*"></script>
+  <script src="./scripts/models.js"></script>
+</head>
+<body>
+  <div id="forgeViewer"></div>
+
+  <script>
+    async function initViewer() {
+      const urn = getUrnForCurrentPage();
+
+      if (!urn) {
+        console.error("❌ Tidak ada URN untuk halaman ini");
+        document.getElementById('forgeViewer').innerHTML = "<p>Model belum tersedia untuk halaman ini.</p>";
+        return;
+      }
+
       const options = {
         env: 'AutodeskProduction2',
         api: 'derivativeV2_EU',
@@ -20,19 +36,27 @@
         }
       };
 
-      const urn = `urn:${urn}`;
+      const documentId = `urn:${urn}`;
 
       Autodesk.Viewing.Initializer(options, () => {
         const viewerDiv = document.getElementById('forgeViewer');
         const viewer = new Autodesk.Viewing.GuiViewer3D(viewerDiv);
         viewer.start();
-        Autodesk.Viewing.Document.load(urn, (doc) => {
-          const defaultModel = doc.getRoot().getDefaultGeometry();
-          viewer.loadDocumentNode(doc, defaultModel);
-        }, (errCode, errMsg) => {
-          console.error("Error loading document:", errCode, errMsg);
-        });
+
+        Autodesk.Viewing.Document.load(
+          documentId,
+          (doc) => {
+            const defaultModel = doc.getRoot().getDefaultGeometry();
+            viewer.loadDocumentNode(doc, defaultModel);
+          },
+          (errCode, errMsg) => {
+            console.error("Error loading document:", errCode, errMsg);
+          }
+        );
       });
-    </script>
-  </body>
+    }
+
+    initViewer();
+  </script>
+</body>
 </html>
