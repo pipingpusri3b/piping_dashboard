@@ -1,5 +1,4 @@
 function getUrnForCurrentPage() {
-  const path = window.location.pathname.toLowerCase();
   console.log("🧭 Current path:", path);
 
   const models = {
