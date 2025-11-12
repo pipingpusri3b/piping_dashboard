@@ -13,5 +13,6 @@ function getUrnForCurrentPage() {
 
   const urn = models[path];
   if (!urn) console.warn("⚠️ URN tidak ditemukan untuk path:", path);
+  console.log("📄 Path detected:", window.location.pathname);
   return urn;
 }
