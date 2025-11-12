@@ -1,9 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta http-equiv="refresh" content="0; url=/Construction/rwi.html">
+    <meta charset="utf-8" />
+    <title>Test EU Viewer</title>
+    <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/style.min.css?v=v7.*">
+    <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/viewer3D.min.js?v=v7.*"></script>
+    <style>html,body,#forgeViewer{height:100%;margin:0}</style>
   </head>
   <body>
+    <div id="forgeViewer"></div>
+    <script>
+      const options = {
+        env: 'AutodeskProduction2',
+        api: 'derivativeV2_EU',
+        getAccessToken: async (onTokenReady) => {
+          const res = await fetch("/api/token");
+          const data = await res.json();
+          onTokenReady(data.access_token, data.expires_in);
+        }
+      };
+
+      const urn = "urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6bXlwbGFudDNkMjAyNTA5MDYvOTcwMDAubndk";
+
+      Autodesk.Viewing.Initializer(options, () => {
+        const viewerDiv = document.getElementById('forgeViewer');
+        const viewer = new Autodesk.Viewing.GuiViewer3D(viewerDiv);
+        viewer.start();
+        Autodesk.Viewing.Document.load(urn, (doc) => {
+          const defaultModel = doc.getRoot().getDefaultGeometry();
+          viewer.loadDocumentNode(doc, defaultModel);
+        }, (errCode, errMsg) => {
+          console.error("Error loading document:", errCode, errMsg);
+        });
+      });
+    </script>
   </body>
 </html>
-
