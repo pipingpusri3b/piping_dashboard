@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   try {
-    const response = await fetch("https://developer.api.autodesk.eu/authentication/v2/token", {
+    const response = await fetch("https://developer.api.autodesk.com/authentication/v2/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -15,10 +15,12 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const text = await response.text();
+      console.error("⚠️ Token API Response:", text);
       throw new Error(`Token API gagal: ${text}`);
     }
 
     const data = await response.json();
+    console.log("✅ Token berhasil dibuat");
     res.status(200).json(data);
   } catch (err) {
     console.error("❌ Gagal mendapatkan token:", err);
